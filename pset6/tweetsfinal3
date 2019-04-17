@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import nltk#para obtener los tweets
+import html#para hacer render
+import os#para llamar al sistema???
+import plotly# NI IDEA
+import socket# NI IDEA
+import sys#SITEMA????
+
+from twython import Twython##para importar twython
+from twython import TwythonAuthError, TwythonError, TwythonRateLimitError# y sus mensajes de error
+from analyzer import Analyzer#mandar llamar anyliser
+from nltk.tokenize import TweetTokenizer#tweet tokennizer
+from termcolor import colored#colorear los tweets
+
+def main():
+
+    # Ensure proper usage ##promt para obtener del usuario
+    if len(sys.argv) !=2:
+        sys.exit("Usage: ./tweets USER")
+
+    # Setting up screen_name and count
+    screen_name = sys.argv[1]
+    count = 50
+
+    # Ensure getting 50 tweets  # sacar 50 tweets
+    if count < 1 or count > 50:
+        raise RuntimeError("invalid count")
+        sys.exit("invalid count")
+
+
+
+    ####### esto ocurrira 50 veces #### aqui debo llamar a tokenizer para que evalue los resultados
+    try:
+        # Setting up environment variables # obtengo las enviroment claves
+        twitter = Twython( 'P6hCYrRhyKiCYtpR58grTj1bp', 'bKWdo9g9MaZi2OYHHSGacFRELUwmG1JhGvf3rG562J11VKDGd5' )
+
+        # Look up for the user # creo que aqui busca a los usurios
+        user = twitter.lookup_user(screen_name=screen_name.lstrip("@"))##usurio sera esto
+        if user[0]["protected"]:#para proteger el programa aqui esta tomando el User[0] como el que queremos
+            return None
+            sys.exit("Private account")
+        # Getting the tweets #aqui estoy obteniendo los tweets
+        tweets = twitter.get_user_timeline(screen_name=screen_name, count=count)
+
+
+
+
+ ######       return [html.unescape(tweet["text"].replace("\n", " ")) for tweet in tweets]#aqui no se porque llamo HTML################
+#########################   Exepciones  #################################
+    except TwythonAuthError:
+        raise RuntimeError("invalid API_KEY and/or API_SECRET") from None
+        sys.exit("invalid API_KEY and/or API_SECRET")
+    except TwythonRateLimitError:
+        raise RuntimeError("you've hit a rate limit") from None
+        sys.exit("you've hit a rate limit")
+    except TwythonError:
+        sys.exit("Twython Error")
+        return None
+
+# export API_KEY=P6hCYrRhyKiCYtpR58grTj1bp
+# export API_SECRET=bKWdo9g9MaZi2OYHHSGacFRELUwmG1JhGvf3rG562J11VKDGd5
+# tknzr = TweetTokenizer(strip_handles=True, reduce_len=True)
+#####aqui API KEY y API SERCRET estan directamente colocados en twython
